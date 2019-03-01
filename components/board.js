@@ -61,7 +61,7 @@ class Board extends Component {
     }
     getUniqueId=()=>{
         b=Board.a++;
-        console.warn(b)
+        //console.warn(b)
         return b;
     }
     gridItemSender=(player=0,animat,timing=100)=>{
@@ -76,7 +76,7 @@ class Board extends Component {
                 duration={timing}
                 style={styles.kukra} 
                 key={this.getUniqueId()} >
-                <Icon name={icon}/>
+                <Icon name={icon} style={styles.kukri}/>
             </View>
         );
     }
@@ -119,7 +119,7 @@ class Board extends Component {
         },180)
     }
     isSafePlace = (row,col) =>{
-        let safe=[1,2,3,4,-1,5];
+        let safe=[1,2,3,4,-1];
         for(i=0;i<safe.length;i++){
             if(this.state.gridforPlacement[row][col]==safe[i]) return true;
         };
@@ -280,6 +280,7 @@ class Board extends Component {
             else return false;
         }
     }
+    //Moveing Direction
     getDir=(row,col,isReverse=false,parcel,remainDiceValue)=>{
         if(a=this.moveInside(row,col,isReverse,parcel,remainDiceValue)) return a;
         else{
@@ -321,14 +322,14 @@ class Board extends Component {
 			<TouchableOpacity activeOpacity={1} key={this.getUniqueId()} style={styles.box}
 				onPress={()=>this.BoxTouchHandler(row,col)}>
                 <View style={{flex:1}}>
-                    <ImageBackground style={{width:'100%',height:'100%'}} 
-                    source={require('../assets/703674.jpg')}>
+                    {/* <ImageBackground style={{width:'100%',height:'100%'}}  */}
+                    {/* source={require('../assets/703674.jpg')}> */}
                         <View style={styles.innerWrapper}>
                             <View style={styles.innerWrapper}>                           
                                 {this.state.physicalGrid[row][col]}
                             </View>
                         </View>
-                    </ImageBackground>
+                    {/* </ImageBackground> */}
                 </View>
 			</TouchableOpacity>
 		)
@@ -341,7 +342,6 @@ class Board extends Component {
 				temp.push(this.PutButton(i,j))
 			}
 			board.push(<View key={this.getUniqueId()} style={styles.row}>{temp}</View>);
-			temp=[]
 		}
 		return (
         <View>
@@ -351,6 +351,8 @@ class Board extends Component {
         </View>)
 	}
 	dice=()=>{
+        if(this.state.diceValue != 0) return;
+        if(!this.state.readyToPlay) return;
         let possible=[1,2,1,2,3,3,3,4,8];
         let random=possible[Math.floor(Math.random() * 9)]
 		this.setState({
@@ -380,10 +382,16 @@ class Board extends Component {
 }
 const styles = StyleSheet.create({
     row:{flexDirection:'row'},
+    // row:{flexDirection:'row',transform:[{ rotateX: '45deg' }, { rotateZ: '0.785398rad' }]},
     box:{height:80,width:80,borderWidth:0.8},
     addon:{flex:1},
     addonText:{},
-    kukra:{width:'50%'},
+    kukra:{
+        width:'50%', 
+    },
+    kukri:{
+        color:'firebrick'
+    },
     innerWrapper:{flex:1,flexDirection:'row',flexWrap:"wrap",alignItems:'flex-end'}
 }); 
 
