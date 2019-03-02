@@ -280,7 +280,7 @@ class Board extends Component {
             else return false;
         }
     }
-    //Moveing Direction
+    //Moving Direction
     getDir=(row,col,isReverse=false,parcel,remainDiceValue)=>{
         if(a=this.moveInside(row,col,isReverse,parcel,remainDiceValue)) return a;
         else{
@@ -376,6 +376,24 @@ class Board extends Component {
                         <Button title="Roll A dice" onPress={()=>this.dice()}/>
                     </View>
                 </View>
+                <View style={styles.winist}>
+                    <View style={styles.listitem}>
+                        <Text>Player 1</Text>
+                        <Text>0</Text>
+                    </View>
+                    <View style={styles.listitem}>
+                        <Text>Player 2</Text>
+                        <Text>0</Text>
+                    </View>
+                    <View style={styles.listitem}>
+                        <Text>Player 3</Text>
+                        <Text>0</Text>
+                    </View>
+                    <View style={styles.listitem}>
+                        <Text>Player 4</Text>
+                        <Text>0</Text>
+                    </View>
+                </View>
 			</View>
 		);
 	}
@@ -392,7 +410,17 @@ const styles = StyleSheet.create({
     kukri:{
         color:'firebrick'
     },
-    innerWrapper:{flex:1,flexDirection:'row',flexWrap:"wrap",alignItems:'flex-end'}
+    innerWrapper:{flex:1,flexDirection:'row',flexWrap:"wrap",alignItems:'flex-end'},
+    winist:{
+        marginTop: 30,
+        flex:4,
+        flexDirection:'row',
+        justifyContent:'space-around'
+    },
+    listitem:{
+        flex:1,
+        alignItems:'center',
+    }
 }); 
 
 export default Board;
