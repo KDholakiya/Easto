@@ -1,9 +1,10 @@
 import React, { Component } from "react";
-import { StyleSheet, TouchableOpacity, ImageBackground, Button } from "react-native";
+import { StyleSheet, TouchableOpacity, ImageBackground, Button,Dimensions } from "react-native";
 import { Icon } from "native-base";
-import Addon from "./AddonProvider.js"
-import PlaceComponent from "./PlaceComponent";
+// import Addon from "./AddonProvider.js"
+// import PlaceComponent from "./PlaceComponent";
 import { Text,View } from "react-native-animatable";
+const d = Dimensions.get("window");
 class Board extends Component {
     constructor(props) {
         super(props);
@@ -18,11 +19,11 @@ class Board extends Component {
             readyToPlay: false,
             totalPlayer: this.props.player,
             gameGrid: [
-                [[], [], [4,4,1,4], [], []],
-                [[], [], [], [1], []],
-                [[1,3,4], [], [], [], [3,3,3]],
-                [[], [], [], [2], []],
-                [[], [2,1,2], [2], [], []],
+                [[], [], [4,4,4,4], [], []],
+                [[], [], [], [], []],
+                [[1,1,1,1], [], [], [], [3,3,3,3]],
+                [[], [], [], [], []],
+                [[], [], [2,2,2,2], [], []],
             ],
             physicalGrid:[
                 [[], [], [], [], []],
@@ -66,17 +67,30 @@ class Board extends Component {
     }
     gridItemSender=(player=0,animat,timing=100)=>{
         let icon;
-        if(player==1) icon='ios-flame'
-        else if(player==2) icon='ios-star'
-        else if(player==3) icon='ios-flash'
-        else if(player==4) icon='ios-flower'
+        let style;
+        if(player==1){
+            icon='ios-flame';
+            style={color:'blue'}
+        } 
+        else if(player==2){
+            icon='ios-star';
+            style={color:'orange'}
+        } 
+        else if(player==3){
+            icon='ios-flash';
+            style={color:'red'}
+        } 
+        else if(player==4){
+            icon='ios-flower';
+            style={color:'green'}
+        } 
         return (
             <View
                 animation={animat}
                 duration={timing}
                 style={styles.kukra} 
                 key={this.getUniqueId()} >
-                <Icon name={icon} style={styles.kukri}/>
+                <Icon name={icon} style={[styles.kukri,style]}/>
             </View>
         );
     }
@@ -252,7 +266,23 @@ class Board extends Component {
             if (i < diceValue) setTimeout(delay,200);
             else{
                 setTimeout(() => {
-                    this.collision(this_row,this_col,this.deepCopy(grid));
+                    if(this.state.gridforPlacement[this_row][this_col] !== -1 ){
+                        this.collision(this_row,this_col,this.deepCopy(grid));
+                    }else{
+                        stat=this.state.winStat;
+                        stat[this.state.currentPlayer-1]=stat[this.state.currentPlayer-1]+1;
+                        if(stat[this.state.currentPlayer-1]==4) {
+                            console.warn("winner winner Chiken dinner")
+                        }
+                        grid[this_row][this_col]=0;
+                        pgrid=this.deepCopy(this.state.physicalGrid);
+                        pgrid[this_row][this_col]=null;
+                        this.setState({
+                            winStat:stat,
+                            logicalGrid:grid,
+                            physicalGrid:pgrid
+                        });
+                    }
                     this.setState({readyToPlay:true}) 
                 }, 200);
             }
@@ -322,14 +352,11 @@ class Board extends Component {
 			<TouchableOpacity activeOpacity={1} key={this.getUniqueId()} style={styles.box}
 				onPress={()=>this.BoxTouchHandler(row,col)}>
                 <View style={{flex:1}}>
-                    {/* <ImageBackground style={{width:'100%',height:'100%'}}  */}
-                    {/* source={require('../assets/703674.jpg')}> */}
                         <View style={styles.innerWrapper}>
                             <View style={styles.innerWrapper}>                           
                                 {this.state.physicalGrid[row][col]}
                             </View>
                         </View>
-                    {/* </ImageBackground> */}
                 </View>
 			</TouchableOpacity>
 		)
@@ -345,9 +372,7 @@ class Board extends Component {
 		}
 		return (
         <View>
-			<ImageBackground style={{width:null,height:null}} >
-                {board}
-            </ImageBackground>
+            {board}
         </View>)
 	}
 	dice=()=>{
@@ -367,7 +392,13 @@ class Board extends Component {
                         It's Player {this.state.currentPlayer} Turn
                     </Text>
                 </View>
-				{this.renderBoard()}
+                <View>
+                    <ImageBackground style={{width:null,height:null}} 
+                        source={require('../assets/board.png')}> 
+                        {this.renderBoard()}
+                    </ImageBackground>
+                </View>
+				
 				<View>
 					<Text style={{fontSize:26,textAlign:'center'}}>
                         {this.state.diceValue}
@@ -379,19 +410,19 @@ class Board extends Component {
                 <View style={styles.winist}>
                     <View style={styles.listitem}>
                         <Text>Player 1</Text>
-                        <Text>0</Text>
+                        <Text>{this.state.winStat[0]}</Text>
                     </View>
                     <View style={styles.listitem}>
                         <Text>Player 2</Text>
-                        <Text>0</Text>
+                        <Text>{this.state.winStat[1]}</Text>
                     </View>
                     <View style={styles.listitem}>
                         <Text>Player 3</Text>
-                        <Text>0</Text>
+                        <Text>{this.state.winStat[2]}</Text>
                     </View>
                     <View style={styles.listitem}>
                         <Text>Player 4</Text>
-                        <Text>0</Text>
+                        <Text>{this.state.winStat[3]}</Text>
                     </View>
                 </View>
 			</View>
@@ -400,15 +431,23 @@ class Board extends Component {
 }
 const styles = StyleSheet.create({
     row:{flexDirection:'row'},
-    // row:{flexDirection:'row',transform:[{ rotateX: '45deg' }, { rotateZ: '0.785398rad' }]},
-    box:{height:80,width:80,borderWidth:0.8},
+    //row:{flexDirection:'row',transform:[{ rotateX: '45deg' }, { rotateZ: '0.785398rad' }]},
+    box:{
+        height:( (d.width/5) - (3) ),
+        width:( (d.width/5) - (3) ),
+        borderWidth:0
+    },
     addon:{flex:1},
     addonText:{},
     kukra:{
-        width:'50%', 
+        flex:3,
+        flexWrap:'wrap',
     },
     kukri:{
-        color:'firebrick'
+        fontSize:20,
+        flex:1,
+        textAlign:'center',
+        textAlignVertical:'center'
     },
     innerWrapper:{flex:1,flexDirection:'row',flexWrap:"wrap",alignItems:'flex-end'},
     winist:{
@@ -417,10 +456,7 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         justifyContent:'space-around'
     },
-    listitem:{
-        flex:1,
-        alignItems:'center',
-    }
+    listitem:{ flex:1, alignItems:'center', }
 }); 
 
 export default Board;
